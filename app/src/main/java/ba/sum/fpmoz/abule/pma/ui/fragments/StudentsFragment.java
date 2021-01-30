@@ -1,6 +1,7 @@
 package ba.sum.fpmoz.abule.pma.ui.fragments;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -29,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import ba.sum.fpmoz.abule.pma.ClassViewActivity;
+import ba.sum.fpmoz.abule.pma.ClassesActivity;
 import ba.sum.fpmoz.abule.pma.R;
 import ba.sum.fpmoz.abule.pma.ui.adapters.StudentsAdapter;
 import ba.sum.fpmoz.abule.pma.model.Student;
@@ -41,7 +43,6 @@ public class StudentsFragment extends Fragment {
     DatabaseReference ref;
     private ArrayList<Student> studentsList;
     private RecyclerView studentsRecyclerView;
-    private String className;
 
     public StudentsFragment() {};
 
@@ -52,25 +53,18 @@ public class StudentsFragment extends Fragment {
         studentsList = new ArrayList<>();
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi";
+        String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi/" + ClassViewActivity.classUid + "/studenti";
         ref = db.getReference(reference);
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                studentsList = new ArrayList<>();
                 // looping through the data
                 for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-//                    System.out.println("Razredi: " + itemSnapshot.child("name").getValue().toString());
-                    if(itemSnapshot.child("name").getValue().toString().equals(className)){
-                        studentsList = new ArrayList<>();
-                        for(DataSnapshot snap : itemSnapshot.child("studenti").getChildren()){
-                            Student s = snap.getValue(Student.class);
-                            studentsList.add(s);
-                        }
-                        setAdapter();
-                    }
+                    Student s = itemSnapshot.getValue(Student.class);
+                    studentsList.add(s);
                 }
+                setAdapter();
             }
 
             @Override
@@ -82,8 +76,6 @@ public class StudentsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ClassViewActivity parentActivity = (ClassViewActivity) getActivity();
-        className = parentActivity.getClassName();
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_students, container, false);
         studentsRecyclerView = v.findViewById(R.id.studentsRecyclerView);
@@ -101,30 +93,11 @@ public class StudentsFragment extends Fragment {
             Button submit = dialog.findViewById(R.id.submitStudentBtn);
 
             submit.setOnClickListener(v1 -> {
-
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-                            if(itemSnapshot.child("name").getValue().toString().equals(className)){
-                                String newStudentKey = itemSnapshot.child("studenti").getRef().push().getKey();
-                                itemSnapshot.child("studenti").getRef().child(newStudentKey).setValue(new Student(newStudentKey, studentName.getText().toString(), studentSurname.getText().toString()));
-                                dialog.dismiss();
-                                Snackbar.make(v, "New class successfully added", Snackbar.LENGTH_SHORT).setActionTextColor(Color.BLUE)
-                                        .setAction("OK", null).show();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                String newStudentKey = ref.push().getKey();
+                ref.child(newStudentKey).setValue(new Student(newStudentKey, studentName.getText().toString(), studentSurname.getText().toString()));
             });
             dialog.show();
         });
-
         return v;
     }
 

@@ -52,25 +52,19 @@ public class SubjectsFragment extends Fragment {
         subjectsList = new ArrayList<>();
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance();
-        String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi";
+        String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi/" + ClassViewActivity.classUid + "/predmeti";
+        System.out.println(reference);
         ref = db.getReference(reference);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                subjectsList = new ArrayList<>();
                 // looping through the data
                 for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-                    if(itemSnapshot.child("name").getValue().toString().equals(className)){
-                        subjectsList = new ArrayList<>();
-                        for(DataSnapshot snap : itemSnapshot.child("predmeti").getChildren()){
-                            Subject s = snap.getValue(Subject.class);
-                            System.out.println("Subject: " + s.name);
-                            subjectsList.add(s);
-                        }
-                        setAdapter();
-                    }
+                    Subject s = itemSnapshot.getValue(Subject.class);
+                    subjectsList.add(s);
                 }
+                setAdapter();
             }
 
             @Override
@@ -82,8 +76,6 @@ public class SubjectsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ClassViewActivity parentActivity = (ClassViewActivity) getActivity();
-        className = parentActivity.getClassName();
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_subjects, container, false);
         subjectsRecyclerView = v.findViewById(R.id.subjectsRecyclerView);
@@ -100,26 +92,8 @@ public class SubjectsFragment extends Fragment {
             Button submit = dialog.findViewById(R.id.submitSubjectBtn);
 
             submit.setOnClickListener(v1 -> {
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-                            if(itemSnapshot.child("name").getValue().toString().equals(className)){
-                                String newSubjectKey = itemSnapshot.child("predmeti").getRef().push().getKey();
-                                itemSnapshot.child("predmeti").getRef().child(newSubjectKey).setValue(new Subject(newSubjectKey, subjectName.getText().toString()));
-//                                Log.d("studenti ref: ", itemSnapshot.child("studenti").getRef().toString());
-                                dialog.dismiss();
-                                Snackbar.make(v, "New subject successfully added", Snackbar.LENGTH_SHORT).setActionTextColor(Color.BLUE)
-                                        .setAction("OK", null).show();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                String newSubjectKey = ref.push().getKey();
+                ref.child(newSubjectKey).setValue(new Subject(newSubjectKey, subjectName.getText().toString()));
             });
             dialog.show();
         });

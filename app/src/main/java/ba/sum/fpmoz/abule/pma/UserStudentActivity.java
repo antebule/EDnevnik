@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import ba.sum.fpmoz.abule.pma.model.Class;
 import ba.sum.fpmoz.abule.pma.model.Subject;
 import ba.sum.fpmoz.abule.pma.ui.adapters.ClassesAdapter;
+import ba.sum.fpmoz.abule.pma.ui.adapters.FirebaseSubjectsAdapter;
 import ba.sum.fpmoz.abule.pma.ui.adapters.SubjectsAdapter;
 
 public class UserStudentActivity extends AppCompatActivity {
@@ -51,9 +52,8 @@ public class UserStudentActivity extends AppCompatActivity {
     private Button signOutBtn;
 //    private SubjectsAdapter subjectsAdapter;
 
-
+    private FirebaseSubjectsAdapter adapter;
     private FirebaseRecyclerOptions<Subject> options;
-    private FirebaseRecyclerAdapter<Subject, SubjectViewHolder> firebaseAdapter;
 
 
     @Override
@@ -76,45 +76,12 @@ public class UserStudentActivity extends AppCompatActivity {
         String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/predmeti";
         this.ref = db.getReference(reference);
         this.subjectsRecyclerView = findViewById(R.id.subjectsRecyclerView1);
-        this.subjectsRecyclerView.setHasFixedSize(true);
+//        this.subjectsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        this.subjectsRecyclerView.setLayoutManager(new LinearLayoutManager(UserStudentActivity.this));
+        options = new FirebaseRecyclerOptions.Builder<Subject>().setLifecycleOwner(UserStudentActivity.this).setQuery(this.ref, Subject.class).build();
 
-
-        this.subjectsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        options = new FirebaseRecyclerOptions.Builder<Subject>().setQuery(this.ref, Subject.class).build();
-        firebaseAdapter = new FirebaseRecyclerAdapter<Subject, SubjectViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull SubjectViewHolder holder, int position, @NonNull Subject model) {
-//                String subjectName = subjectsList.get(position).name;
-
-                holder.subjectName.setText(model.name);
-            }
-
-            @Override
-            public void onDataChanged() {
-                super.onDataChanged();
-//                firebaseAdapter.notifyDataSetChanged();
-                Log.d("data changed", "new subject added");
-            }
-
-            @Override
-            public void onChildChanged(@NonNull ChangeEventType type, @NonNull DataSnapshot snapshot, int newIndex, int oldIndex) {
-                super.onChildChanged(type, snapshot, newIndex, oldIndex);
-//                firebaseAdapter.notifyDataSetChanged();
-                Log.d("child changed", "new child added");
-            }
-
-            @NonNull
-            @Override
-            public SubjectViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.subject_item, parent, false);
-                return new SubjectViewHolder(v);
-            }
-        };
-
-        firebaseAdapter.startListening();
-        subjectsRecyclerView.setAdapter(firebaseAdapter);
-
-
+        adapter = new FirebaseSubjectsAdapter(options);
+        subjectsRecyclerView.setAdapter(adapter);
 
         this.signOutBtn = findViewById(R.id.signOutBtn1);
 
@@ -123,20 +90,18 @@ public class UserStudentActivity extends AppCompatActivity {
         });
 
 //        subjectsList = new ArrayList<>();
-//        this.subjectsAdapter = new SubjectsAdapter(getApplicationContext(), subjectsList);
-//        setAdapter();
-
+//
 //        ref.addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {
-////                subjectsList = new ArrayList<>();
+//                subjectsList.clear();
 //                // looping through the data
 //                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
 ////                    String subject = itemSnapshot.child("name").getValue().toString();
 //                    Subject s = itemSnapshot.getValue(Subject.class);
 //                    subjectsList.add(s);
 //                }
-////                setAdapter();
+////                subjectsAdapter.notifyDataSetChanged();
 //            }
 //
 //            @Override
@@ -161,31 +126,32 @@ public class UserStudentActivity extends AppCompatActivity {
                 dialog.dismiss();
                 //                Snackbar.make(view, "New subject successfully added", Snackbar.LENGTH_SHORT).setAction("OK", null).show();
                 Toast.makeText(UserStudentActivity.this, "New subject successfully added", Toast.LENGTH_SHORT).show();
-//                subjectsAdapter.notifyDataSetChanged();
-//                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//
-//                    }
-//                });
             });
             dialog.show();
         });
 
+//        setAdapter();
     }
 
-    public void setAdapter() {
-//        SubjectsAdapter subjectsAdapter = new SubjectsAdapter(getApplicationContext(), subjectsList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        subjectsRecyclerView.setLayoutManager(layoutManager);
-        subjectsRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        subjectsRecyclerView.setAdapter(subjectsAdapter);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        adapter.startListening();
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+//    public void setAdapter() {
+//        subjectsAdapter = new SubjectsAdapter(getApplicationContext(), subjectsList);
+//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+//        subjectsRecyclerView.setLayoutManager(layoutManager);
+//        subjectsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//        subjectsRecyclerView.setAdapter(subjectsAdapter);
+//    }
 
 
     public void signOut() {

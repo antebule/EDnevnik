@@ -23,14 +23,21 @@ import java.util.ArrayList;
 
 import ba.sum.fpmoz.abule.pma.model.Class;
 import ba.sum.fpmoz.abule.pma.model.Student;
+import ba.sum.fpmoz.abule.pma.ui.adapters.TabbedAdapter;
+import ba.sum.fpmoz.abule.pma.ui.fragments.AddUsersFragment;
+import ba.sum.fpmoz.abule.pma.ui.fragments.ListUsersFragment;
+import ba.sum.fpmoz.abule.pma.ui.fragments.StudentsFragment;
+import ba.sum.fpmoz.abule.pma.ui.fragments.SubjectsFragment;
 
 public class ClassViewActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private TabItem tabStudents;
-    private TabItem tabSubjects;
-    public  String selectedClass;
+//    private TabItem tabStudents;
+//    private TabItem tabSubjects;
+    private TabbedAdapter adapter;
+    public  static String selectedClass;
+    public static String classUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,38 +46,42 @@ public class ClassViewActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         selectedClass = intent.getStringExtra("selectedClass");
+        classUid = intent.getStringExtra("classUid");
         Toast.makeText(ClassViewActivity.this, selectedClass + " selected", Toast.LENGTH_SHORT).show();
 
         this.tabLayout = findViewById(R.id.tabLayout);
-        this.tabStudents = findViewById(R.id.tabStudents);
-        this.tabSubjects = findViewById(R.id.tabSubjects);
+//        this.tabStudents = findViewById(R.id.tabStudents);
+//        this.tabSubjects = findViewById(R.id.tabSubjects);
         this.viewPager = findViewById(R.id.viewPager);
 
-        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(pagerAdapter);
+        this.adapter = new TabbedAdapter(getSupportFragmentManager());
+        this.adapter.addFragment(new StudentsFragment(), "Studenti");
+        this.adapter.addFragment(new SubjectsFragment(), "Predmeti");
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
+        this.viewPager.setAdapter(this.adapter);
+        this.tabLayout.setupWithViewPager(this.viewPager);
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
-        // solved swiping problems
-        tabLayout.setupWithViewPager(viewPager);
-    }
-
-    public String getClassName(){
-        return selectedClass;
+//        PagerAdapter pagerAdapter = new PagerAdapter(getSupportFragmentManager());
+//        viewPager.setAdapter(pagerAdapter);
+//
+//        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+//            @Override
+//            public void onTabSelected(TabLayout.Tab tab) {
+//                viewPager.setCurrentItem(tab.getPosition());
+//            }
+//
+//            @Override
+//            public void onTabUnselected(TabLayout.Tab tab) {
+//
+//            }
+//
+//            @Override
+//            public void onTabReselected(TabLayout.Tab tab) {
+//
+//            }
+//        });
+//
+//        // solved swiping problems
+//        tabLayout.setupWithViewPager(viewPager);
     }
 }

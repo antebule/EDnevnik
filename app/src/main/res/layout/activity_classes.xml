@@ -20,13 +20,14 @@
         android:src="@drawable/ic_add_class"
         android:layout_alignParentRight="true"
         android:layout_marginRight="20dp"
-        app:backgroundTint="@color/purple_500"
+        app:backgroundTint="@color/blue_500"
         app:rippleColor="@color/white"/>
 
     <LinearLayout
         android:id="@+id/navbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal"
         android:orientation="horizontal">
 
         <!--            promijeniti text u uloga-->
@@ -34,17 +35,16 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Student"
+            android:layout_gravity="start"
+            android:layout_weight="1"
+            android:text="Profesor"
             android:textSize="28sp" />
-
-        <androidx.legacy.widget.Space
-            android:layout_width="160dp"
-            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/signOutBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:text="Odjavi se" />
     </LinearLayout>
 

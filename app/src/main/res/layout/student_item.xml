@@ -1,45 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    android:outlineAmbientShadowColor="@color/black"
     >
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/studentCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="10dp"
-        app:cardBackgroundColor="@color/teal_200"
+        app:strokeWidth="1dp"
+        app:strokeColor="#053886"
+        app:cardElevation="10dp"
+        app:contentPadding="5dp"
         >
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
+            <TextView
+                android:id="@+id/studentUid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
             <TextView
                 android:id="@+id/studentNameTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@color/black"
+                android:padding="10dp"
                 android:textSize="28dp"
-                android:padding="10dp"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/studentSurnameTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@color/black"
+                android:layout_toRightOf="@+id/studentNameTxt"
+                android:gravity="end"
+                android:padding="10dp"
                 android:textSize="28dp"
-                android:padding="10dp"/>
-        </LinearLayout>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_delete"
+                app:backgroundTint="#FFFFFF" />
+        </RelativeLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+</RelativeLayout>

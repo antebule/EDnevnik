@@ -1,35 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
-    android:outlineAmbientShadowColor="@color/black"
     >
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/classCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="10dp"
-        app:cardBackgroundColor="@color/teal_200"
-        >
+        app:strokeWidth="1dp"
+        app:strokeColor="#053886"
+        app:cardElevation="10dp"
+        app:contentPadding="5dp">
 
-        <TextView
-            android:id="@+id/classNameTxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textColor="@color/black"
-            android:textSize="28dp"
-            android:padding="10dp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/classNameTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="28dp"
+                android:padding="10dp"/>
 
+            <TextView
+                android:id="@+id/classUid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"/>
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_delete_class"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_delete"
+                app:backgroundTint="#FFFFFF" />
+        </RelativeLayout>
+    >
     </com.google.android.material.card.MaterialCardView>
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

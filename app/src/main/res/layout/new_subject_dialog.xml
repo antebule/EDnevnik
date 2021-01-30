@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:background="@color/purple_500"
+        android:background="@color/blue_500"
         android:text="Dodaj"
         android:textColor="@color/white" />
 </LinearLayout>

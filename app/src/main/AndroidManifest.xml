@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EDnevnik">
-        <activity android:name=".UserStudentActivity"></activity>
+        <activity android:name=".StudentViewActivity" />
+        <activity android:name=".UserStudentActivity" />
         <activity android:name=".TabbedUserAdminActivity" />
         <activity android:name=".UserAdminActivity" />
         <activity android:name=".ClassViewActivity" />

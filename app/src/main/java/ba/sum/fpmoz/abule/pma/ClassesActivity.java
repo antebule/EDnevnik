@@ -38,6 +38,7 @@ public class ClassesActivity extends AppCompatActivity {
     private ArrayList<Class> classesList;
     private RecyclerView classesRecyclerView;
     private Button signOutBtn;
+    private ValueEventListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class ClassesActivity extends AppCompatActivity {
             signOut();
         });
 
-        ref.addValueEventListener(new ValueEventListener() {
+        listener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 classesList = new ArrayList<>();
@@ -82,7 +83,8 @@ public class ClassesActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        ref.addValueEventListener(listener);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
@@ -112,9 +114,33 @@ public class ClassesActivity extends AppCompatActivity {
         classesRecyclerView.setAdapter(classesAdapter);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        ref.removeEventListener(listener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ref.removeEventListener(listener);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        ref.addValueEventListener(listener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ref.addValueEventListener(listener);
+    }
+
     public void signOut() {
         mAuth.signOut();
-        Intent i = new Intent(this, MainActivity.class);
+        Intent i = new Intent(ClassesActivity.this, MainActivity.class);
         startActivity(i);
     }
 }
