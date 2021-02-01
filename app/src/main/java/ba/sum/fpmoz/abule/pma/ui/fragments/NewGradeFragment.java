@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ import ba.sum.fpmoz.abule.pma.R;
 import ba.sum.fpmoz.abule.pma.StudentViewActivity;
 import ba.sum.fpmoz.abule.pma.model.Grade;
 import ba.sum.fpmoz.abule.pma.model.Subject;
+import ba.sum.fpmoz.abule.pma.model.User;
 
 public class NewGradeFragment extends Fragment {
     FirebaseAuth mAuth = FirebaseAuth.getInstance();
@@ -44,12 +46,6 @@ public class NewGradeFragment extends Fragment {
         EditText gradeValue = v.findViewById(R.id.gradeValueInp);
         Button submit = v.findViewById(R.id.submitGradeBtn);
         DatePicker date = v.findViewById(R.id.gradeDatePicker);
-
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(year, month, day);
-//        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-//        String formattedDate = sdf.format(calendar.getTime());
-//        System.out.println("formatted date: " + formattedDate);
 
         Spinner subjectsSpinner = v.findViewById(R.id.subjectsSpinner);
         List<Subject> subjects = new ArrayList<>();
@@ -82,8 +78,13 @@ public class NewGradeFragment extends Fragment {
             String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi/" + ClassViewActivity.classUid + "/studenti/" + StudentViewActivity.studentUid + "/ocjene";
             DatabaseReference ref = db.getReference(reference);
             String newGradeKey = ref.push().getKey();
-            ref.child(newGradeKey).setValue(new Grade(newGradeKey,  selectedDate, gradeValue.getText().toString(), gradeDesc.getText().toString(), StudentViewActivity.studentUid, selectedSubject.uid));
-            Toast.makeText(getContext(), "New grade successfully added", Toast.LENGTH_SHORT).show();
+            Grade newGrade = new Grade(newGradeKey,  selectedDate, gradeValue.getText().toString(), gradeDesc.getText().toString(), StudentViewActivity.studentUid, selectedSubject.uid, selectedSubject.name);
+            ref.child(newGradeKey).setValue(newGrade);
+            DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("ednevnik/korisnici/" + StudentViewActivity.studentUid + "/ocjene");
+            usersRef.child(newGradeKey).setValue(newGrade);
+            Toast.makeText(getContext(), "Nova ocjena uspješno dodana!", Toast.LENGTH_SHORT).show();
+            gradeValue.setText("");
+            gradeDesc.setText("");
         });
         return v;
     }

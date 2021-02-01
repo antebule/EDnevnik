@@ -1,58 +1,65 @@
 package ba.sum.fpmoz.abule.pma.ui.adapters;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
-
 import ba.sum.fpmoz.abule.pma.ClassViewActivity;
-import ba.sum.fpmoz.abule.pma.ClassesActivity;
 import ba.sum.fpmoz.abule.pma.R;
 import ba.sum.fpmoz.abule.pma.model.Class;
 
-public class ClassesAdapter extends RecyclerView.Adapter<ClassesAdapter.MyViewHolder> {
-    private ArrayList<Class> classesList;
-    private Context context;
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+public class FirebaseClassesAdapter extends FirebaseRecyclerAdapter<Class, FirebaseClassesAdapter.ClassViewHolder> {
 
-    public ClassesAdapter(ArrayList<Class> classesList){
-        this.classesList = classesList;
+    public FirebaseClassesAdapter(@NonNull FirebaseRecyclerOptions<Class> options) {
+        super(options);
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
-        private TextView className;
-        private TextView classUid;
-        private CardView classCardView;
-        private FloatingActionButton delete;
+    @Override
+    protected void onBindViewHolder(@NonNull ClassViewHolder holder, int position, @NonNull Class model) {
+        holder.className.setText(model.name);
+        holder.classUid.setText(model.uid);
+    }
 
-        public MyViewHolder(@NonNull final View itemView) {
+    @NonNull
+    @Override
+    public ClassViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.class_item, parent, false);
+        return new ClassViewHolder(v);
+    }
+
+    public class ClassViewHolder extends RecyclerView.ViewHolder{
+        TextView className;
+        TextView classUid;
+        CardView classCardView;
+        FloatingActionButton delete;
+
+        public ClassViewHolder(@NonNull View itemView) {
             super(itemView);
-            context = itemView.getContext();
             className = itemView.findViewById(R.id.classNameTxt);
             classUid = itemView.findViewById(R.id.classUid);
             classCardView = itemView.findViewById(R.id.classCardView);
             delete = itemView.findViewById(R.id.fab_delete_class);
 
             delete.setOnClickListener(v -> {
-                Dialog dialog = new Dialog(context);
+                Dialog dialog = new Dialog(itemView.getContext());
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setCancelable(true);
                 dialog.setContentView(R.layout.delete_dialog);
@@ -69,42 +76,21 @@ public class ClassesAdapter extends RecyclerView.Adapter<ClassesAdapter.MyViewHo
                 });
 
                 del.setOnClickListener(v2 -> {
-                    String reference = "ednevnik/korisnici/" + mAuth.getCurrentUser().getUid() + "/razredi/"  + classUid.getText();
+                    String reference = "ednevnik/korisnici/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/razredi/"  + classUid.getText();
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference(reference);
                     ref.removeValue();
                     dialog.dismiss();
-                    Snackbar.make(v, "New class successfully added", Snackbar.LENGTH_SHORT).setAction("OK", null).show();
+                    Toast.makeText(itemView.getContext(), "Razred " + className.getText() + " uspješno obrisan!", Toast.LENGTH_SHORT).show();
                 });
                 dialog.show();
             });
 
             classCardView.setOnClickListener(v -> {
-                Intent i = new Intent(context, ClassViewActivity.class);
+                Intent i = new Intent(itemView.getContext(), ClassViewActivity.class);
                 i.putExtra("selectedClass", className.getText().toString());
                 i.putExtra("classUid", classUid.getText());
-                context.startActivity(i);
+                itemView.getContext().startActivity(i);
             });
         }
-    }
-
-    @NonNull
-    @Override
-    public ClassesAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.class_item, parent, false);
-        return new MyViewHolder(itemView);
-    }
-
-
-    @Override
-    public void onBindViewHolder(@NonNull ClassesAdapter.MyViewHolder holder, int position) {
-        String className = classesList.get(position).name;
-        String classUid = classesList.get(position).uid;
-        holder.className.setText(className);
-        holder.classUid.setText(classUid);
-    }
-
-    @Override
-    public int getItemCount() {
-        return classesList.size();
     }
 }

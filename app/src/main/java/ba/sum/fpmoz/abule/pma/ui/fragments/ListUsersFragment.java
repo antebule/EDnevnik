@@ -15,7 +15,7 @@ public class ListUsersFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View userListView = inflater.inflate(R.layout.activity_user_list, container, false);
+        View userListView = inflater.inflate(R.layout.fragment_users_list, container, false);
         return userListView;
     }
 }

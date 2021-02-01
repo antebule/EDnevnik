@@ -4,19 +4,15 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,29 +21,27 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import ba.sum.fpmoz.abule.pma.model.Class;
-import ba.sum.fpmoz.abule.pma.ui.adapters.ClassesAdapter;
+import ba.sum.fpmoz.abule.pma.ui.adapters.FirebaseClassesAdapter;
 
 public class ClassesActivity extends AppCompatActivity {
     FirebaseDatabase db;
     DatabaseReference ref;
     FirebaseUser user;
     FirebaseAuth mAuth;
-    private ArrayList<Class> classesList;
-    private RecyclerView classesRecyclerView;
+
     private Button signOutBtn;
-    private ValueEventListener listener;
+    private RecyclerView classesRecyclerView;
+    private FirebaseClassesAdapter adapter;
+    private FirebaseRecyclerOptions<Class> options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_classes);
+        setTitle("Razredi");
 
         this.mAuth = FirebaseAuth.getInstance();
-//        this.user = mAuth.getCurrentUser();
-//        System.out.println(mAuth.getCurrentUser() == null);
         // TODO: solve google sign-in user problem
         if(mAuth.getCurrentUser() == null){
             Toast.makeText(this, "No email", Toast.LENGTH_SHORT).show();
@@ -66,29 +60,14 @@ public class ClassesActivity extends AppCompatActivity {
             signOut();
         });
 
-        listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                classesList = new ArrayList<>();
-                // looping through the data
-                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-//                    String razred = itemSnapshot.child("name").getValue().toString();
-                    Class c = itemSnapshot.getValue(Class.class);
-                    classesList.add(c);
-                }
-                setAdapter();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        ref.addValueEventListener(listener);
+        this.classesRecyclerView.setLayoutManager(new LinearLayoutManager(ClassesActivity.this));
+        options = new FirebaseRecyclerOptions.Builder<Class>().setLifecycleOwner(ClassesActivity.this).setQuery(this.ref, Class.class).build();
+        adapter = new FirebaseClassesAdapter(options);
+        classesRecyclerView.setAdapter(adapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
-            Dialog dialog = new Dialog(ClassesActivity.this);
+            Dialog dialog = new Dialog(view.getContext());
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setCancelable(true);
             dialog.setContentView(R.layout.new_class);
@@ -100,42 +79,22 @@ public class ClassesActivity extends AppCompatActivity {
                 String newClassKey = ref.push().getKey();
                 ref.child(newClassKey).setValue(new Class(newClassKey, className.getText().toString()));
                 dialog.dismiss();
-                Snackbar.make(view, "New class successfully added", Snackbar.LENGTH_SHORT).setAction("OK", null).show();
+                Toast.makeText(ClassesActivity.this, "Novi razred uspješno dodan!", Toast.LENGTH_SHORT).show();
             });
             dialog.show();
         });
     }
 
-    public void setAdapter() {
-        ClassesAdapter classesAdapter = new ClassesAdapter(classesList);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-        classesRecyclerView.setLayoutManager(layoutManager);
-        classesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        classesRecyclerView.setAdapter(classesAdapter);
-    }
-
     @Override
-    protected void onStop() {
-        super.onStop();
-        ref.removeEventListener(listener);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        ref.removeEventListener(listener);
-    }
-
-    @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        ref.addValueEventListener(listener);
+        adapter.startListening();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        ref.addValueEventListener(listener);
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
     }
 
     public void signOut() {

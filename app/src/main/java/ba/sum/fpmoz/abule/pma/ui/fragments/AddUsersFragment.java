@@ -20,42 +20,43 @@ import com.google.firebase.database.ValueEventListener;
 
 import ba.sum.fpmoz.abule.pma.R;
 import ba.sum.fpmoz.abule.pma.model.Student;
+import ba.sum.fpmoz.abule.pma.model.User;
 
 public class AddUsersFragment extends Fragment {
     FirebaseDatabase db;
     DatabaseReference ref;
 
-    EditText studentNameInp;
-    EditText studentSurnameInp;
-    EditText studentUidInp;
-    Button addStudentBtn;
+    EditText teacherNameInp;
+    EditText teacherSurnameInp;
+    EditText teacherEmailInp;
+    Button addTeacherBtn;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View userAdminView = inflater.inflate(R.layout.activity_user_admin, container, false);
+        View userAdminView = inflater.inflate(R.layout.fragment_add_users, container, false);
 
-        this.studentNameInp = userAdminView.findViewById(R.id.studentNameInp);
-        this.studentSurnameInp = userAdminView.findViewById(R.id.studentSurnameInp);
-        this.studentUidInp = userAdminView.findViewById(R.id.studentUidInp);
-        this.addStudentBtn = userAdminView.findViewById(R.id.addStudentBtn);
+        this.teacherNameInp = userAdminView.findViewById(R.id.teacherNameInp);
+        this.teacherSurnameInp = userAdminView.findViewById(R.id.teacherSurnameInp);
+        this.teacherEmailInp = userAdminView.findViewById(R.id.teacherEmailInp);
+        this.addTeacherBtn = userAdminView.findViewById(R.id.addTeacherBtn);
 
         this.db = FirebaseDatabase.getInstance();
-        this.ref = db.getReference("ednevnik/ucenici");
+        this.ref = db.getReference("ednevnik/korisnici");
 
-        addStudentBtn.setOnClickListener(v -> {
-            String studentName = studentNameInp.getText().toString();
-            String studentSurname = studentSurnameInp.getText().toString();
-            String studentUid = studentUidInp.getText().toString();
+        addTeacherBtn.setOnClickListener(v -> {
+//            String teacherName = teacherNameInp.getText().toString();
+//            String teacherSurname = teacherSurnameInp.getText().toString();
+            String teacherEmail = teacherEmailInp.getText().toString();
 
-            String newStudentKey = ref.push().getKey();
-            ref.child(newStudentKey).setValue(new Student(studentUid, studentName, studentSurname));
+            String newTeacherKey = ref.push().getKey();
+            ref.child(newTeacherKey).setValue(new User(newTeacherKey, teacherEmail, "teacher"));
 
-            Toast.makeText(userAdminView.getContext(), "Uspješno ste dodali učenika", Toast.LENGTH_SHORT).show();
+            Toast.makeText(userAdminView.getContext(), "Uspješno ste dodali profesora", Toast.LENGTH_SHORT).show();
 
-            studentNameInp.setText("");
-            studentSurnameInp.setText("");
-            studentUidInp.setText("");
+            teacherNameInp.setText("");
+            teacherSurnameInp.setText("");
+            teacherEmailInp.setText("");
         });
 
         // dohvacanje podataka

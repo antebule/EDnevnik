@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +23,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,8 +32,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import ba.sum.fpmoz.abule.pma.ClassesActivity;
 import ba.sum.fpmoz.abule.pma.R;
+import ba.sum.fpmoz.abule.pma.UserAdminActivity;
 import ba.sum.fpmoz.abule.pma.UserStudentActivity;
-import ba.sum.fpmoz.abule.pma.model.Student;
+import ba.sum.fpmoz.abule.pma.model.User;
 
 
 public class LoginUserFragment extends Fragment {
@@ -92,14 +92,18 @@ public class LoginUserFragment extends Fragment {
             String email = emailInp.getText().toString();
             String password = passwordInp.getText().toString();
 
-            mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
-                        login();
-                    } else {
-                        errorMsg();
-                    }
-                });
+            if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
+                errorMsg();
+            } else {
+                mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()){
+                            login();
+                        } else {
+                            errorMsg();
+                        }
+                    });
+            }
         });
         return loginView;
     }
@@ -128,24 +132,34 @@ public class LoginUserFragment extends Fragment {
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("signIn Error", "signInResult:failed code=" + e.getStatusCode());
             errorMsg();
-            //TODO: update UI with some error message
-//            updateUI(null);
         }
     }
 
     private void login() {
         messageTxt.setText("Uspješno ste se prijavili na sustav.");
-        String userID = mAuth.getCurrentUser().getUid();
+        String userMail = mAuth.getCurrentUser().getEmail();
         FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference("ednevnik/korisnici/"+ userID);
-        ref.addValueEventListener(new ValueEventListener() {
+        DatabaseReference ref = db.getReference("ednevnik/korisnici");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("role: ", snapshot.child("role").getValue().toString());
-                if(snapshot.child("role").getValue().toString().equals("teacher")){
-                    startActivity(new Intent(getContext(), ClassesActivity.class));
-                } else {
-                    startActivity(new Intent(getContext(), UserStudentActivity.class));
+                for (DataSnapshot itemSnapshot : snapshot.getChildren()){
+                    User u  = itemSnapshot.getValue(User.class);
+                    if(u.email.equals(userMail)){
+                        switch (u.role) {
+                            case "teacher":
+                                startActivity(new Intent(getContext(), ClassesActivity.class));
+                                break;
+                            case "admin":
+                                startActivity(new Intent(getContext(), UserAdminActivity.class));
+                                break;
+                            default:
+                                Intent i = new Intent(getContext(), UserStudentActivity.class);
+                                i.putExtra("studentKey", itemSnapshot.getKey());
+                                startActivity(i);
+                                break;
+                        }
+                    }
                 }
             }
 

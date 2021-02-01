@@ -1,6 +1,8 @@
 package ba.sum.fpmoz.abule.pma.ui.fragments;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,8 +16,11 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import ba.sum.fpmoz.abule.pma.R;
 import ba.sum.fpmoz.abule.pma.model.User;
@@ -31,7 +36,6 @@ public class RegisterUserFragment extends Fragment {
     private EditText passwordInp;
     private EditText passwordCnfInp;
     private Button registerBtn;
-    private RadioButton studentRadioBtn;
 
     public RegisterUserFragment() {}
 
@@ -48,40 +52,69 @@ public class RegisterUserFragment extends Fragment {
         this.passwordInp = registerView.findViewById(R.id.passwordInp1);
         this.passwordCnfInp = registerView.findViewById(R.id.passwordCnfInp);
         this.registerBtn = registerView.findViewById(R.id.registerBtn1);
-        this.studentRadioBtn = registerView.findViewById(R.id.studentRadioBtn);
 
         this.registerBtn.setOnClickListener(v -> {
             final String displayName = displayNameInp.getText().toString();
             String email = emailInp.getText().toString();
             String password = passwordInp.getText().toString();
             String passwordCnf = passwordCnfInp.getText().toString();
-            final String role = studentRadioBtn.isChecked() ? "student" : "teacher";
 
             if (!password.equals(passwordCnf)){
                 messageTxt.setText("Lozinke se ne podudaraju");
             } else {
-                mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()){
-                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                        UserProfileChangeRequest changeRequest = new UserProfileChangeRequest
-                                .Builder()
-                                .setDisplayName(displayName)
-                                .build();
-                        user.updateProfile(changeRequest).addOnCompleteListener(task1 -> {
-                            if (task1.isSuccessful()){
-                                emailInp.setText("");
-                                passwordInp.setText("");
-                                passwordCnfInp.setText("");
-                                messageTxt.setText("Vaš korisnički račun je uspješno napravljen, možete se logirati na sustav.");
-                                displayNameInp.setText("");
-
-                                User newUser = new User(user.getUid(), user.getEmail(), role);
-                                ref.child(user.getUid()).setValue(newUser);
-                                studentRadioBtn.setChecked(true);
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    boolean exists = false;
+                    String uid = "";
+                    String userRole = "";
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot itemSnapshot : snapshot.getChildren()){
+                            User u = itemSnapshot.getValue(User.class);
+                            if(u.email.equals(email)){
+//                                String print = "Email: " + u.email + "\nrole: " + u.role + "\nuid: " + u.uid;
+//                                System.out.println(print);
+                                uid = u.uid;
+                                userRole = u.role;
+                                exists = true;
                             }
-                        });
-                    } else {
-                        Toast.makeText(getContext(), "Nastala je greška s registracijom na sustav: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                        if(exists){
+                            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()){
+                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                    UserProfileChangeRequest changeRequest = new UserProfileChangeRequest
+                                            .Builder()
+                                            .setDisplayName(displayName)
+                                            .build();
+                                    user.updateProfile(changeRequest).addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()){
+                                            emailInp.setText("");
+                                            passwordInp.setText("");
+                                            passwordCnfInp.setText("");
+                                            messageTxt.setText("Vaš korisnički račun je uspješno napravljen, možete se logirati na sustav.");
+                                            displayNameInp.setText("");
+
+                                            if(userRole.equals("student")){
+                                                ref.child(uid).child("uid").setValue(user.getUid());
+                                            } else {
+                                                User newUser = new User(user.getUid(), user.getEmail(), userRole);
+                                                ref.child(user.getUid()).setValue(newUser);
+                                                ref.child(uid).removeValue();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(getContext(), "Nastala je greška s registracijom na sustav: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        } else {
+                            messageTxt.setText("Ne postoji korisnik s tim email-om u bazi, obratite se profesoru ili administratoru da napravi Vaš korisnički račun");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
             }
