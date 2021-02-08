@@ -1,5 +1,6 @@
 package ba.sum.fpmoz.abule.pma;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -7,25 +8,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
-import ba.sum.fpmoz.abule.pma.model.Class;
-import ba.sum.fpmoz.abule.pma.model.Subject;
 import ba.sum.fpmoz.abule.pma.model.User;
-import ba.sum.fpmoz.abule.pma.ui.adapters.FirebaseSubjectsAdapter;
 import ba.sum.fpmoz.abule.pma.ui.adapters.FirebaseUsersAdapter;
 
 public class UserAdminActivity extends AppCompatActivity {
@@ -73,17 +73,50 @@ public class UserAdminActivity extends AppCompatActivity {
             Dialog dialog = new Dialog(UserAdminActivity.this);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             dialog.setCancelable(true);
-            dialog.setContentView(R.layout.fragment_add_users);
+            dialog.setContentView(R.layout.add_users_dialog);
 
+            TextView errorMsg = dialog.findViewById(R.id.errorAdminMsgTxt);
             EditText userEmail = dialog.findViewById(R.id.teacherEmailInp);
             Button submit = dialog.findViewById(R.id.addTeacherBtn);
 
             submit.setOnClickListener(v -> {
-                String newUserKey = ref.push().getKey();
                 String email = userEmail.getText().toString();
-                ref.child(newUserKey).setValue(new User(newUserKey, email, "teacher"));
-                dialog.dismiss();
-                Toast.makeText(UserAdminActivity.this, "New user successfully added", Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(email)){
+                    errorMsg.setText("Nepotpuni podaci!");
+                } else {
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boolean exists = false;
+                            for (DataSnapshot userSnapshot : snapshot.getChildren()){
+                                User user = userSnapshot.getValue(User.class);
+                                if(user.email.equals(email)){
+                                    exists = true;
+                                }
+                            }
+
+                            if(exists){
+                                errorMsg.setText("Korisnik s istim emailom već postoji u bazi!");
+                            } else {
+                                String newUserKey = ref.push().getKey();
+                                String email = userEmail.getText().toString();
+                                ref.child(newUserKey).setValue(new User(newUserKey, email, "teacher"));
+                                dialog.dismiss();
+                                Toast.makeText(UserAdminActivity.this, "Novi profesor uspješno dodan", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+//                String newUserKey = ref.push().getKey();
+//                String email = userEmail.getText().toString();
+//                ref.child(newUserKey).setValue(new User(newUserKey, email, "teacher"));
+//                dialog.dismiss();
+//                Toast.makeText(UserAdminActivity.this, "New user successfully added", Toast.LENGTH_SHORT).show();
             });
             dialog.show();
         });

@@ -30,7 +30,7 @@ public class StudentViewActivity extends AppCompatActivity {
 
         this.adapter = new TabbedAdapter(getSupportFragmentManager());
         this.adapter.addFragment(new GradesFragment(), "Ocjene");
-        this.adapter.addFragment(new NewGradeFragment(), "Dodavanje nove ocjene");
+        this.adapter.addFragment(new NewGradeFragment(), "Nova ocjena");
 
         this.viewPager.setAdapter(this.adapter);
         this.tabLayout.setupWithViewPager(this.viewPager);

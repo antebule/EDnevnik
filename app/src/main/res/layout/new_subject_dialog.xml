@@ -6,6 +6,13 @@
     android:layout_margin="16dp">
 
     <TextView
+        android:id="@+id/errorSubjectMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:textColor="@color/error"/>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -22,7 +29,7 @@
 
     <Button
         android:id="@+id/submitSubjectBtn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:background="@color/blue_500"

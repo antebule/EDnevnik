@@ -1,9 +1,12 @@
 package ba.sum.fpmoz.abule.pma.ui.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +62,9 @@ public class RegisterUserFragment extends Fragment {
             String password = passwordInp.getText().toString();
             String passwordCnf = passwordCnfInp.getText().toString();
 
-            if (!password.equals(passwordCnf)){
+            if(TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordCnf)){
+                messageTxt.setText("Nepotpuni podaci");
+            } else if (!password.equals(passwordCnf)){
                 messageTxt.setText("Lozinke se ne podudaraju");
             } else {
                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -71,8 +76,6 @@ public class RegisterUserFragment extends Fragment {
                         for (DataSnapshot itemSnapshot : snapshot.getChildren()){
                             User u = itemSnapshot.getValue(User.class);
                             if(u.email.equals(email)){
-//                                String print = "Email: " + u.email + "\nrole: " + u.role + "\nuid: " + u.uid;
-//                                System.out.println(print);
                                 uid = u.uid;
                                 userRole = u.role;
                                 exists = true;
@@ -92,6 +95,7 @@ public class RegisterUserFragment extends Fragment {
                                             passwordInp.setText("");
                                             passwordCnfInp.setText("");
                                             messageTxt.setText("Vaš korisnički račun je uspješno napravljen, možete se logirati na sustav.");
+                                            messageTxt.setTextColor(Color.GREEN);
                                             displayNameInp.setText("");
 
                                             if(userRole.equals("student")){

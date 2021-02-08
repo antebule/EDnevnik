@@ -9,22 +9,28 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import ba.sum.fpmoz.abule.pma.ClassViewActivity;
 import ba.sum.fpmoz.abule.pma.R;
+import ba.sum.fpmoz.abule.pma.model.User;
 import ba.sum.fpmoz.abule.pma.ui.adapters.FirebaseSubjectsAdapter;
 import ba.sum.fpmoz.abule.pma.model.Subject;
 
@@ -63,12 +69,40 @@ public class SubjectsFragment extends Fragment {
 
             EditText subjectName = dialog.findViewById(R.id.subjectNameInp);
             Button submit = dialog.findViewById(R.id.submitSubjectBtn);
+            TextView errorMsg = dialog.findViewById(R.id.errorSubjectMsg);
 
             submit.setOnClickListener(v2 -> {
-                String newSubjectKey = ref.push().getKey();
-                ref.child(newSubjectKey).setValue(new Subject(newSubjectKey, subjectName.getText().toString()));
-                Toast.makeText(getContext(), "Novi predmet uspješno dodan!", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
+                String subject = subjectName.getText().toString();
+                if(TextUtils.isEmpty(subject)) {
+                    errorMsg.setText("Nepotpuni podaci!");
+                } else {
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boolean exists = false;
+                            for (DataSnapshot itemSnapshot : snapshot.getChildren()){
+                                Subject s = itemSnapshot.getValue(Subject.class);
+                                if(s.name.equals(subject)){
+                                    exists = true;
+                                }
+                            }
+
+                            if(exists){
+                                errorMsg.setText("Ovaj predmet već postoji u bazi!");
+                            } else {
+                                String newSubjectKey = ref.push().getKey();
+                                ref.child(newSubjectKey).setValue(new Subject(newSubjectKey, subjectName.getText().toString()));
+                                Toast.makeText(getContext(), "Novi predmet uspješno dodan!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
             });
             dialog.show();
         });

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -80,7 +82,8 @@ public class FirebaseStudentsAdapter extends FirebaseRecyclerAdapter<Student, Fi
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReference(reference);
                     ref.removeValue();
                     dialog.dismiss();
-                    Snackbar.make(v, "Student " + studentName.getText() + " uspješno obrisan!", Snackbar.LENGTH_SHORT).setAction("OK", null).show();
+                    Toast.makeText(itemView.getContext(), "Student " + studentName.getText() + " uspješno obrisan!", Toast.LENGTH_SHORT).show();
+//                    Snackbar.make(v, "Student " + studentName.getText() + " uspješno obrisan!", Snackbar.LENGTH_SHORT).setAction("OK", null).show();
                 });
                 dialog.show();
             });

@@ -25,7 +25,7 @@
                 android:id="@+id/gradeUid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -39,11 +39,11 @@
                 android:textSize="28sp"
                 android:padding="10dp"/>
 
-<!--            <TextView-->
-<!--                android:id="@+id/gradeSubjectUid"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:visibility="invisible"/>-->
+            <TextView
+                android:id="@+id/gradeStudentUid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -80,15 +80,29 @@
                 android:layout_height="wrap_content"
                 android:textSize="28sp"
                 android:padding="10dp"/>
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
 
-<!--            <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-<!--                android:id="@+id/fab_delete_grade"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:layout_alignParentRight="true"-->
-<!--                android:src="@drawable/ic_delete"-->
-<!--                app:backgroundTint="#FFFFFF" />-->
+<!--                <Button-->
+<!--                    android:id="@+id/editGradeBtn"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="start"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Uredi"-->
+<!--                    android:layout_marginRight="10dp"-->
+<!--                    android:visibility="gone"/>-->
+
+            <Button
+                android:id="@+id/deleteGradeBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_weight="1"
+                android:text="Obriši"
+                android:visibility="gone"/>
+<!--            </LinearLayout>-->
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

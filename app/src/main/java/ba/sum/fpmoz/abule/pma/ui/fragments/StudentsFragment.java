@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,34 +75,40 @@ public class StudentsFragment extends Fragment {
 
             submit.setOnClickListener(v2 -> {
                 String email = studentEmail.getText().toString();
-                DatabaseReference users = FirebaseDatabase.getInstance().getReference("ednevnik/korisnici");
-                users.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        boolean exists = false;
-                        for (DataSnapshot itemSnapshot : snapshot.getChildren()){
-                            User user = itemSnapshot.getValue(User.class);
-                            if(user.email.equals(email)){
-                                exists = true;
+                String name = studentName.getText().toString();
+                String surname = studentSurname.getText().toString();
+                if(TextUtils.isEmpty(email) || TextUtils.isEmpty(name) || TextUtils.isEmpty(surname)) {
+                    errorMsg.setText("Nepotpuni podaci!");
+                } else {
+                    DatabaseReference users = FirebaseDatabase.getInstance().getReference("ednevnik/korisnici");
+                    users.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boolean exists = false;
+                            for (DataSnapshot itemSnapshot : snapshot.getChildren()){
+                                User user = itemSnapshot.getValue(User.class);
+                                if(user.email.equals(email)){
+                                    exists = true;
+                                }
+                            }
+
+                            if(exists){
+                                errorMsg.setText("Ovaj email već postoji u bazi!");
+                            } else {
+                                String newStudentKey = ref.push().getKey();
+                                ref.child(newStudentKey).setValue(new Student(newStudentKey, name, surname));
+                                users.child(newStudentKey).setValue(new User(newStudentKey, email, "student"));
+                                Toast.makeText(getContext(), "Novi student uspješno dodan!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
                             }
                         }
 
-                        if(exists){
-                            errorMsg.setText("Ovaj email već postoji u bazi!");
-                        } else {
-                            String newStudentKey = ref.push().getKey();
-                            ref.child(newStudentKey).setValue(new Student(newStudentKey, studentName.getText().toString(), studentSurname.getText().toString()));
-                            users.child(newStudentKey).setValue(new User(newStudentKey, email, "student"));
-                            Toast.makeText(getContext(), "Novi student uspješno dodan!", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
                         }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
+                    });
+                }
             });
             dialog.show();
         });

@@ -22,7 +22,7 @@
                 android:id="@+id/studentUid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="invisible"/>
+                android:visibility="gone"/>
             <TextView
                 android:id="@+id/studentNameTxt"
                 android:layout_width="wrap_content"

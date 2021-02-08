@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragments.AddUsersFragment">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,33 +17,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0sp"
-            android:text="Ime profesora" />
-
-        <EditText
-            android:id="@+id/teacherNameInp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10sp"
-            android:ems="10"
-            android:hint="Ime"
-            android:inputType="textPersonName" />
-
-        <TextView
-            android:id="@+id/textView5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0sp"
-            android:text="Prezime profesora" />
-
-        <EditText
-            android:id="@+id/teacherSurnameInp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10sp"
-            android:ems="10"
-            android:hint="Prezime"
-            android:inputType="textPersonName" />
+            android:id="@+id/errorAdminMsgTxt"
+            android:textColor="@color/error"
+            android:layout_marginBottom="10sp"/>
 
         <TextView
             android:id="@+id/textView6"

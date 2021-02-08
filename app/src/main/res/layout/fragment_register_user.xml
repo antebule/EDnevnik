@@ -6,7 +6,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragments.RegisterUserFragment">
 
+    <TextView
+        android:id="@+id/titleRegisterTxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/kaushan_script"
+        android:text="Registracija"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -16,7 +30,8 @@
         <TextView
             android:id="@+id/registerMsg"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/error" />
 
         <TextView
             android:id="@+id/displayNameTxt"
@@ -78,36 +93,36 @@
             android:hint="Ponovite lozinku"
             android:inputType="textPassword" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/textView"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="10sp"-->
-<!--            android:layout_marginBottom="10sp"-->
-<!--            android:text="Uloga" />-->
+        <!--        <TextView-->
+        <!--            android:id="@+id/textView"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginTop="10sp"-->
+        <!--            android:layout_marginBottom="10sp"-->
+        <!--            android:text="Uloga" />-->
 
 
-<!--        <RadioGroup-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:id="@+id/roleRadioGroup">-->
+        <!--        <RadioGroup-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="match_parent"-->
+        <!--            android:orientation="horizontal"-->
+        <!--            android:id="@+id/roleRadioGroup">-->
 
-<!--            <RadioButton-->
-<!--                android:id="@+id/studentRadioBtn"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:checked="true"-->
-<!--                android:text="Student" />-->
+        <!--            <RadioButton-->
+        <!--                android:id="@+id/studentRadioBtn"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:checked="true"-->
+        <!--                android:text="Student" />-->
 
-<!--            <RadioButton-->
-<!--                android:id="@+id/teacherRadioBtn"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:text="Profesor" />-->
-<!--        </RadioGroup>-->
+        <!--            <RadioButton-->
+        <!--                android:id="@+id/teacherRadioBtn"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:layout_weight="1"-->
+        <!--                android:text="Profesor" />-->
+        <!--        </RadioGroup>-->
         <Button
             android:id="@+id/registerBtn1"
             android:layout_width="match_parent"
